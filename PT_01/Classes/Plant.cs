@@ -2,9 +2,9 @@ public class Plant : Organisme
 {
     public double HoogteInMeters { get; set; }
 
-    public Plant()
+    public Plant(string naam, string oorsprong, double hoogte) : base ("plant",  naam, oorsprong)
     {
-        Type = "Plant";
+        this.HoogteInMeters = hoogte;
     }
 
     public override string Beschrijving()
