@@ -2,7 +2,7 @@ public class Plant : Organisme
 {
     public double HoogteInMeters { get; set; }
 
-    public Plant(string naam, string oorsprong, double hoogte) : base ("plant",  naam, oorsprong)
+    public Plant(string naam, string oorsprong, double hoogte) : base("plant", naam, oorsprong)
     {
         this.HoogteInMeters = hoogte;
     }

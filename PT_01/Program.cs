@@ -109,7 +109,7 @@ class Program
                 }
                 else { Console.WriteLine("Voer astublieft een punt in inplaats van een comma"); }
             }
-            ongeldigeinvoer = true ;
+            ongeldigeinvoer = true;
         }
 
         Console.WriteLine("\nOrganisme toegevoegd! Druk op een toets om door te gaan.");
