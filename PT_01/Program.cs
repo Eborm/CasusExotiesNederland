@@ -12,13 +12,14 @@ class Program
 
     static void Main(string[] args)
     {
-        // Initialiseer de database service
+        // Creëren van het pad waar de database is opgeslagen
         string? projectRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\"));
         string? databasePath = Path.Combine(projectRoot, "Database", "organismen.db");
-        Console.WriteLine(databasePath);
+        // Debug Console.WriteLine(databasePath);
 
 
 
+        // Initialiseer de database service
         _databaseService = new DatabaseService(databasePath);
 
         bool doorgaan = true;
