@@ -82,29 +82,38 @@ public class DatabaseService
                 while (reader.Read())
                 {
                     var type = reader.GetString(reader.GetOrdinal("Type"));
+                    Organisme organisme;
+
                     if (type == "dier")
                     {
-                        organismen.Add(new Dier(
-                            reader.GetString(reader.GetOrdinal("Naam")),
-                            reader.GetString(reader.GetOrdinal("Oorsprong")),
-                            reader.IsDBNull(reader.GetOrdinal("Leefgebied")) ? null : reader.GetString(reader.GetOrdinal("Leefgebied"))
-                        ));
+                        organisme = new Dier
+                        {
+                            Naam = reader.GetString(reader.GetOrdinal("Naam")),
+                            Oorsprong = reader.GetString(reader.GetOrdinal("Oorsprong")),
+                            Leefgebied = reader.IsDBNull(reader.GetOrdinal("Leefgebied"))
+                                ? null
+                                : reader.GetString(reader.GetOrdinal("Leefgebied"))
+                        };
                     }
                     else
                     {
-                        organismen.Add(new Plant(
-                            reader.GetString(reader.GetOrdinal("Naam")),
-                            reader.GetString(reader.GetOrdinal("Oorsprong")),
-                            reader.IsDBNull(reader.GetOrdinal("HoogteInMeters")) ? 0 : reader.GetDouble(reader.GetOrdinal("HoogteInMeters"))
-                        ));
+                        organisme = new Plant
+                        {
+                            Naam = reader.GetString(reader.GetOrdinal("Naam")),
+                            Oorsprong = reader.GetString(reader.GetOrdinal("Oorsprong")),
+                            HoogteInMeters = reader.IsDBNull(reader.GetOrdinal("HoogteInMeters"))
+                                ? 0
+                                : reader.GetDouble(reader.GetOrdinal("HoogteInMeters"))
+                        };
                     }
+
+                    organismen.Add(organisme);
                 }
             }
         }
 
         return organismen;
     }
-
 
     public List<Organisme> FilterOpType(string type)
     {
@@ -123,19 +132,21 @@ public class DatabaseService
                 {
                     if (type == "dier")
                     {
-                        organismen.Add(new Dier(
-                            reader.GetString(reader.GetOrdinal("Naam")),
-                            reader.GetString(reader.GetOrdinal("Oorsprong")),
-                            reader.IsDBNull(reader.GetOrdinal("Leefgebied")) ? null : reader.GetString(reader.GetOrdinal("Leefgebied"))
-                        ));
+                        organismen.Add(new Dier
+                        {
+                            Naam = reader.GetString(reader.GetOrdinal("Naam")),
+                            Oorsprong = reader.GetString(reader.GetOrdinal("Oorsprong")),
+                            Leefgebied = reader.GetString(reader.GetOrdinal("Leefgebied"))
+                        });
                     }
-                    else if (type == "plant")
+                    else
                     {
-                        organismen.Add(new Plant(
-                            reader.GetString(reader.GetOrdinal("Naam")),
-                            reader.GetString(reader.GetOrdinal("Oorsprong")),
-                            reader.IsDBNull(reader.GetOrdinal("HoogteInMeters")) ? 0 : reader.GetDouble(reader.GetOrdinal("HoogteInMeters"))
-                        ));
+                        organismen.Add(new Plant
+                        {
+                            Naam = reader.GetString(reader.GetOrdinal("Naam")),
+                            Oorsprong = reader.GetString(reader.GetOrdinal("Oorsprong")),
+                            HoogteInMeters = reader.GetDouble(reader.GetOrdinal("HoogteInMeters"))
+                        });
                     }
                 }
             }
@@ -143,7 +154,6 @@ public class DatabaseService
 
         return organismen;
     }
-
 
     public List<Organisme> FilterOpOorsprong(string oorsprong)
     {
@@ -163,19 +173,21 @@ public class DatabaseService
                     var type = reader.GetString(reader.GetOrdinal("Type"));
                     if (type == "dier")
                     {
-                        organismen.Add(new Dier(
-                            reader.GetString(reader.GetOrdinal("Naam")),
-                            reader.GetString(reader.GetOrdinal("Oorsprong")),
-                            reader.IsDBNull(reader.GetOrdinal("Leefgebied")) ? null : reader.GetString(reader.GetOrdinal("Leefgebied"))
-                        ));
+                        organismen.Add(new Dier
+                        {
+                            Naam = reader.GetString(reader.GetOrdinal("Naam")),
+                            Oorsprong = reader.GetString(reader.GetOrdinal("Oorsprong")),
+                            Leefgebied = reader.GetString(reader.GetOrdinal("Leefgebied"))
+                        });
                     }
-                    else if (type == "plant")
+                    else
                     {
-                        organismen.Add(new Plant(
-                            reader.GetString(reader.GetOrdinal("Naam")),
-                            reader.GetString(reader.GetOrdinal("Oorsprong")),
-                            reader.IsDBNull(reader.GetOrdinal("HoogteInMeters")) ? 0 : reader.GetDouble(reader.GetOrdinal("HoogteInMeters"))
-                        ));
+                        organismen.Add(new Plant
+                        {
+                            Naam = reader.GetString(reader.GetOrdinal("Naam")),
+                            Oorsprong = reader.GetString(reader.GetOrdinal("Oorsprong")),
+                            HoogteInMeters = reader.GetDouble(reader.GetOrdinal("HoogteInMeters"))
+                        });
                     }
                 }
             }

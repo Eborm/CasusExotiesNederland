@@ -4,7 +4,7 @@ public class Plant : Organisme
 
     public Plant(string naam, string oorsprong, double hoogte) : base("plant", naam, oorsprong)
     {
-        this.HoogteInMeters = hoogte;
+        HoogteInMeters = hoogte;
     }
 
     public override string Beschrijving()
