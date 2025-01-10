@@ -248,7 +248,13 @@ class Program
     static void Main(string[] args)
     {
         // Initialiseer de database service
-        _databaseService = new DatabaseService("organismen.db");
+        string? projectRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\"));
+        string? databasePath = Path.Combine(projectRoot, "Database", "organismen.db");
+        Console.WriteLine(databasePath);
+
+
+
+        _databaseService = new DatabaseService(databasePath);
 
         bool doorgaan = true;
         while (doorgaan)
