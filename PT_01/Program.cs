@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
 using System.Data;
 
 public class Organisme
