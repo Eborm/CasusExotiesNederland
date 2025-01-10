@@ -4,8 +4,6 @@ using System.Linq;
 using Microsoft.Data.Sqlite;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using System.Runtime.CompilerServices;
-using Microsoft.Identity.Client;
 
 // Aangepaste Program klasse
 class Program
@@ -68,48 +66,39 @@ class Program
 
     private static void VoegOrganismeToe()
     {
-        string Naam = "";
-        string Oorsprong = "";
-        string type = "";
-        bool ongeldigeinvoer = true;
-        while (ongeldigeinvoer)
+        Console.WriteLine("Is het een dier of plant?");
+        string type = Console.ReadLine();
+
+        if (type.ToLower() == "dier")
         {
-            Console.WriteLine("Is het een dier of plant?");
-            type = Console.ReadLine().ToLower();
+            var dier = new Dier();
+            Console.Write("Voer de naam in: ");
+            dier.Naam = Console.ReadLine();
 
-            if (type == "dier" || type == "plant") { ongeldigeinvoer = false; }
-            else { Console.WriteLine("Voer astublief dier of plant in."); }
-        }
-        ongeldigeinvoer = true;
-        Console.Write("Voer de naam in: ");
-        Naam = Console.ReadLine();
-        Console.Write("Is het inheems of exotisch? ");
-        Oorsprong = Console.ReadLine();
-
-        if (type == "dier")
-        {
-
+            Console.Write("Is het inheems of exotisch? ");
+            dier.Oorsprong = Console.ReadLine();
 
             Console.Write("Wat is het leefgebied? ");
-            string Leefgebied = Console.ReadLine();
+            dier.Leefgebied = Console.ReadLine();
 
-            var dier = new Dier(Naam, Oorsprong, Leefgebied);
             _databaseService.VoegOrganismeToe(dier);
         }
-        else
+        else if (type.ToLower() == "plant")
         {
-            while (ongeldigeinvoer)
+            var plant = new Plant();
+            Console.Write("Voer de naam in: ");
+            plant.Naam = Console.ReadLine();
+
+            Console.Write("Is het inheems of exotisch? ");
+            plant.Oorsprong = Console.ReadLine();
+
+            Console.Write("Wat is de hoogte in meters? ");
+            if (double.TryParse(Console.ReadLine(), out double hoogte))
             {
-                Console.Write("Wat is de hoogte in meters? ");
-                if (double.TryParse(Console.ReadLine(), out double hoogte))
-                {
-                    var plant = new Plant(Naam, Oorsprong, hoogte);
-                    ongeldigeinvoer = false;
-                    _databaseService.VoegOrganismeToe(plant);
-                }
-                else { Console.WriteLine("Voer astublieft een punt in inplaats van een comma"); }
+                plant.HoogteInMeters = hoogte;
             }
-            ongeldigeinvoer = true ;
+
+            _databaseService.VoegOrganismeToe(plant);
         }
 
         Console.WriteLine("\nOrganisme toegevoegd! Druk op een toets om door te gaan.");

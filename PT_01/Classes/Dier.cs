@@ -2,11 +2,10 @@ public class Dier : Organisme
 {
     public string Leefgebied { get; set; }
 
-    public Dier(string naam, string oorpsrong, string leefgebied) : base ("dier", naam, oorpsrong)
+    public Dier()
     {
-        this.Leefgebied = leefgebied;        
+        Type = "Dier";
     }
-    
 
     public override string Beschrijving()
     {
