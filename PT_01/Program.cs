@@ -83,8 +83,14 @@ class Program
         ongeldigeinvoer = true;
         Console.Write("Voer de naam in: ");
         Naam = Console.ReadLine();
-        Console.Write("Is het inheems of exotisch? ");
-        Oorsprong = Console.ReadLine();
+        while (ongeldigeinvoer)
+        {
+            Console.Write("Is het inheems of exotisch? ");
+            Oorsprong = Console.ReadLine().ToLower();
+            if (Oorsprong == "inheems" || Oorsprong == "exotisch") { ongeldigeinvoer = false; }
+            else { Console.WriteLine("Ongeldige invoer."); }
+        }
+        ongeldigeinvoer = true;
 
         if (type == "dier")
         {
@@ -139,7 +145,7 @@ class Program
     private static void FilterOpType()
     {
         Console.Write("Welk type wil je zien (Dier/Plant)? ");
-        string type = Console.ReadLine();
+        string type = Console.ReadLine().ToLower();
 
         var gefilterd = _databaseService.FilterOpType(type);
 
@@ -154,8 +160,18 @@ class Program
 
     private static void FilterOpOorsprong()
     {
-        Console.Write("Welke oorsprong wil je zien (Inheems/Exoot)? ");
-        string oorsprong = Console.ReadLine();
+        bool ongeldigeinvoer = true;
+        while (ongeldigeinvoer)
+        {
+            Console.Write("Welke oorsprong wil je zien (Inheems/Exoot)? ");
+            string oorsprong = Console.ReadLine().ToLower();
+            if (oorsprong == "inheems" || oorsprong == "exoot")
+            {
+                ongeldigeinvoer = false;
+                if (oorsprong == "exooot") { oorsprong = "exotisch"; }
+            }
+            else { Console.WriteLine("Ongeldige invoer"); }
+        }
 
         var gefilterd = _databaseService.FilterOpOorsprong(oorsprong);
 
