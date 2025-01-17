@@ -107,7 +107,24 @@ class Program
             while (ongeldigeinvoer)
             {
                 Console.Write("Wat is de hoogte in meters? ");
-                if (double.TryParse(Console.ReadLine(), out double hoogte))
+                string hoogteString = Console.ReadLine();
+                string tempstring = hoogteString;
+                
+                List<string> templist = tempstring.Split(",").ToList();
+                for (int i = 0; i < templist.Count; i++)
+                {
+                    List<string> templist2 = templist[i].Split(".").ToList();
+                    templist2.Reverse();
+                    templist.Remove(templist[i]);
+                    for (int j = 0; j < templist2.Count; j++)
+                    {
+                        templist.Add(templist2[j]);
+                    }
+                }
+                templist.Reverse();
+                hoogteString = string.Join(",", templist);
+
+                if (double.TryParse(hoogteString, out double hoogte))
                 {
                     var plant = new Plant(Naam, Oorsprong, hoogte);
                     ongeldigeinvoer = false;
@@ -161,10 +178,11 @@ class Program
     private static void FilterOpOorsprong()
     {
         bool ongeldigeinvoer = true;
+        string oorsprong = "";
         while (ongeldigeinvoer)
         {
             Console.Write("Welke oorsprong wil je zien (Inheems/Exoot)? ");
-            string oorsprong = Console.ReadLine().ToLower();
+            oorsprong = Console.ReadLine().ToLower();
             if (oorsprong == "inheems" || oorsprong == "exoot")
             {
                 ongeldigeinvoer = false;
