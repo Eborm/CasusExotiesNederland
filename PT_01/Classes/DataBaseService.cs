@@ -70,6 +70,10 @@ public class DatabaseService
     public List<Organisme> HaalAlleOrganismenOp()
     {
         var organismen = new List<Organisme>();
+        string Naam = "";
+        string Oorsprong = "";
+        string Leefgebied = "";
+        double HoogteInMeters = 0.0;
 
         using (var connection = new SqliteConnection(_connectionString))
         {
@@ -84,19 +88,19 @@ public class DatabaseService
                     var type = reader.GetString(reader.GetOrdinal("Type"));
                     if (type == "dier")
                     {
-                        organismen.Add(new Dier(
-                            reader.GetString(reader.GetOrdinal("Naam")),
-                            reader.GetString(reader.GetOrdinal("Oorsprong")),
-                            reader.IsDBNull(reader.GetOrdinal("Leefgebied")) ? null : reader.GetString(reader.GetOrdinal("Leefgebied"))
-                        ));
+                        Naam = reader.GetString(reader.GetOrdinal("Naam"));
+                        Oorsprong = reader.GetString(reader.GetOrdinal("Oorsprong"));
+                        Leefgebied = reader.IsDBNull(reader.GetOrdinal("Leefgebied")) ? null : reader.GetString(reader.GetOrdinal("Leefgebied"));
+                        Dier tempDier = new Dier(Naam, Oorsprong, Leefgebied);
+                        organismen.Add(tempDier);
                     }
                     else
                     {
-                        organismen.Add(new Plant(
-                            reader.GetString(reader.GetOrdinal("Naam")),
-                            reader.GetString(reader.GetOrdinal("Oorsprong")),
-                            reader.IsDBNull(reader.GetOrdinal("HoogteInMeters")) ? 0 : reader.GetDouble(reader.GetOrdinal("HoogteInMeters"))
-                        ));
+                        Naam = reader.GetString(reader.GetOrdinal("Naam"));
+                        Oorsprong = reader.GetString(reader.GetOrdinal("Oorsprong"));
+                        HoogteInMeters = reader.GetDouble(reader.GetOrdinal("HoogteInMeters"));
+                        Plant tempPlant = new Plant(Naam, Oorsprong, HoogteInMeters);
+                        organismen.Add(tempPlant);
                     }
                 }
             }
