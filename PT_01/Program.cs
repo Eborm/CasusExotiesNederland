@@ -6,20 +6,22 @@ using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Runtime.CompilerServices;
 using Microsoft.Identity.Client;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Globalization;
 
 // Aangepaste Program klasse
 class Program
 {
     private static DatabaseService _databaseService;
 
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
+        await ToonLocatieViaIP();
+
         // Creëren van het pad waar de database is opgeslagen
         string? projectRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\"));
         string? databasePath = Path.Combine(projectRoot, "Database", "organismen.db");
-        // Debug Console.WriteLine(databasePath);
-
-
 
         // Initialiseer de database service
         _databaseService = new DatabaseService(databasePath);
@@ -66,6 +68,48 @@ class Program
         Console.WriteLine("5. Afsluiten");
     }
 
+    private static async Task ToonLocatieViaIP()
+    {
+        string apiUrl = "https://ipwhois.app/json/";
+
+        using HttpClient client = new HttpClient();
+
+        try
+        {
+            // Maak een GET-aanroep naar de gratis API
+            HttpResponseMessage response = await client.GetAsync(apiUrl);
+            response.EnsureSuccessStatusCode();
+
+            // Lees de JSON-respons
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            // JSON-parser
+            dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(responseBody);
+
+            // Haal de gewenste gegevens op
+            string city = data.city;
+            string region = data.region;
+            string country = data.country;
+            string latitude = data.latitude;
+            string longitude = data.longitude;
+
+            // Toon de locatiegegevens
+            Console.WriteLine("Locatiegegevens op basis van IP:");
+            Console.WriteLine($"Stad: {city}");
+            Console.WriteLine($"Regio: {region}");
+            Console.WriteLine($"Land: {country}");
+            Console.WriteLine($"Breedtegraad: {latitude}");
+            Console.WriteLine($"Lengtegraad: {longitude}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fout bij het ophalen van locatie: {ex.Message}");
+        }
+
+        Console.WriteLine("\nDruk op een toets om door te gaan.");
+        Console.ReadKey();
+    }
+
     private static void VoegOrganismeToe()
     {
         string Naam = "";
@@ -94,8 +138,6 @@ class Program
 
         if (type == "dier")
         {
-
-
             Console.Write("Wat is het leefgebied? ");
             string Leefgebied = Console.ReadLine();
 
@@ -108,29 +150,14 @@ class Program
             {
                 Console.Write("Wat is de hoogte in meters? ");
                 string hoogteString = Console.ReadLine();
-                string tempstring = hoogteString;
-                
-                List<string> templist = tempstring.Split(",").ToList();
-                for (int i = 0; i < templist.Count; i++)
-                {
-                    List<string> templist2 = templist[i].Split(".").ToList();
-                    templist2.Reverse();
-                    templist.Remove(templist[i]);
-                    for (int j = 0; j < templist2.Count; j++)
-                    {
-                        templist.Add(templist2[j]);
-                    }
-                }
-                templist.Reverse();
-                hoogteString = string.Join(",", templist);
 
-                if (double.TryParse(hoogteString, out double hoogte))
+                if (double.TryParse(hoogteString, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double hoogte))
                 {
                     var plant = new Plant(Naam, Oorsprong, hoogte);
                     ongeldigeinvoer = false;
                     _databaseService.VoegOrganismeToe(plant);
                 }
-                else { Console.WriteLine("Voer astublieft een punt in inplaats van een comma"); }
+                else { Console.WriteLine("Voer astublieft een geldig getal in."); }
             }
             ongeldigeinvoer = true;
         }
@@ -186,7 +213,7 @@ class Program
             if (oorsprong == "inheems" || oorsprong == "exoot")
             {
                 ongeldigeinvoer = false;
-                if (oorsprong == "exooot") { oorsprong = "exotisch"; }
+                if (oorsprong == "exoot") { oorsprong = "exotisch"; }
             }
             else { Console.WriteLine("Ongeldige invoer"); }
         }
