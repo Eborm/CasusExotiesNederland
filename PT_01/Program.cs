@@ -195,7 +195,7 @@ class Program
                 {
                     var plant = new Plant(Naam, Oorsprong, hoogte, Land, Breedtegraad, Lengtegraad, beschrijving);
                     ongeldigeinvoer = false;
-                    _databaseService.VoegOrganismeToe(dier);
+                    _databaseService.VoegOrganismeToe(plant);
                 }
                 else { Console.WriteLine("Voer astublieft een geldig getal in."); }
             }
