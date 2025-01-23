@@ -17,8 +17,6 @@ class Program
 
     static async Task Main(string[] args)
     {
-        await ToonLocatieViaIP();
-
         // Creëren van het pad waar de database is opgeslagen
         string? projectRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\"));
         string? databasePath = Path.Combine(projectRoot, "Database", "organismen.db");
@@ -36,7 +34,7 @@ class Program
             switch (keuze)
             {
                 case "1":
-                    VoegOrganismeToe();
+                    await VoegOrganismeToe();
                     break;
                 case "2":
                     ToonAlleOrganismen();
@@ -48,6 +46,9 @@ class Program
                     FilterOpOorsprong();
                     break;
                 case "5":
+                    VolledigeBeschrijving();
+                    break;
+                case "6":
                     doorgaan = false;
                     break;
                 default:
@@ -65,10 +66,11 @@ class Program
         Console.WriteLine("2. Alle organismen bekijken");
         Console.WriteLine("3. Filteren op type (Dier/Plant)");
         Console.WriteLine("4. Filteren op oorsprong (Inheems/Exoot)");
-        Console.WriteLine("5. Afsluiten");
+        Console.WriteLine("5. Volledige beschrijving tonen");
+        Console.WriteLine("6. Afsluiten");
     }
 
-    private static async Task ToonLocatieViaIP()
+    private static async Task<string> ToonLocatieViaIP()
     {
         string apiUrl = "https://ipwhois.app/json/";
 
@@ -93,25 +95,32 @@ class Program
             string latitude = data.latitude;
             string longitude = data.longitude;
 
-            // Toon de locatiegegevens
-            Console.WriteLine("Locatiegegevens op basis van IP:");
-            Console.WriteLine($"Stad: {city}");
-            Console.WriteLine($"Regio: {region}");
-            Console.WriteLine($"Land: {country}");
-            Console.WriteLine($"Breedtegraad: {latitude}");
-            Console.WriteLine($"Lengtegraad: {longitude}");
+            string datastring = country.ToString() + "," +latitude.ToString() + "," +longitude.ToString();
+            return datastring;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Fout bij het ophalen van locatie: {ex.Message}");
+            return "fail";
         }
-
-        Console.WriteLine("\nDruk op een toets om door te gaan.");
-        Console.ReadKey();
     }
 
-    private static void VoegOrganismeToe()
+    private static async Task VoegOrganismeToe()
     {
+        string Data = await ToonLocatieViaIP();
+
+        string Land = "";
+        double Breedtegraad = 0.000;
+        double Lengtegraad = 0.000;
+
+        if (Data != "fail")
+        {
+            List<string> DataList = Data.Split(',').ToList();
+            Land = DataList[0];
+            Breedtegraad = double.Parse(DataList[1], CultureInfo.InvariantCulture);
+            Lengtegraad = double.Parse(DataList[2], CultureInfo.InvariantCulture);
+        }
+        string beschrijving = "";
         string Naam = "";
         string Oorsprong = "";
         string type = "";
@@ -135,13 +144,32 @@ class Program
             else { Console.WriteLine("Ongeldige invoer."); }
         }
         ongeldigeinvoer = true;
+        while (ongeldigeinvoer)
+        {
+            Console.WriteLine("Wilt u een beschrijving toevoegen? (ja/nee)");
+            string tempinput = Console.ReadLine().ToLower();
+            if (tempinput == "ja" || tempinput == "nee")
+            {
+                ongeldigeinvoer = false ;
+                if (tempinput == "ja")
+                {
+                    Console.WriteLine("Type de beschrijving");
+                    beschrijving = Console.ReadLine();
+                }    
+            }
+            else
+            {
+                Console.WriteLine("ongeldige invoer");
+            }
+        }
+        ongeldigeinvoer = true;
 
         if (type == "dier")
         {
             Console.Write("Wat is het leefgebied? ");
             string Leefgebied = Console.ReadLine();
 
-            var dier = new Dier(Naam, Oorsprong, Leefgebied);
+            var dier = new Dier(Naam, Oorsprong, Leefgebied, Land, Breedtegraad, Lengtegraad, beschrijving);
             _databaseService.VoegOrganismeToe(dier);
         }
         else
@@ -150,12 +178,25 @@ class Program
             {
                 Console.Write("Wat is de hoogte in meters? ");
                 string hoogteString = Console.ReadLine();
+                string tempstring = hoogteString;
 
-                if (double.TryParse(hoogteString, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double hoogte))
+                List<string> templist = tempstring.Split(",").ToList();
+                for (int i = 0; i < templist.Count; i++)
                 {
-                    var plant = new Plant(Naam, Oorsprong, hoogte);
+                    List<string> templist2 = templist[i].Split(".").ToList();
+                    templist2.Reverse();
+                    templist.Remove(templist[i]);
+                    for (int j = 0; j < templist2.Count; j++)
+                    {
+                        templist.Add(templist2[j]);
+                    }
+                }
+                templist.Reverse();
+                hoogteString = string.Join(",", templist);
+                if (double.TryParse(hoogteString, out double hoogte))
+                {
+                    var plant = new Plant(Naam, Oorsprong, hoogte, Land, Breedtegraad, Lengtegraad, beschrijving);
                     ongeldigeinvoer = false;
-                    _databaseService.VoegOrganismeToe(plant);
                 }
                 else { Console.WriteLine("Voer astublieft een geldig getal in."); }
             }
@@ -226,6 +267,12 @@ class Program
         }
 
         Console.WriteLine("\nDruk op een toets om door te gaan.");
+        Console.ReadKey();
+    }
+
+    private static void VolledigeBeschrijving()
+    {
+        Console.WriteLine("Test_KYS");
         Console.ReadKey();
     }
 }
