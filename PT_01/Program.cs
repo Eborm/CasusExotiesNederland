@@ -89,8 +89,6 @@ class Program
             dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(responseBody);
 
             // Haal de gewenste gegevens op
-            string city = data.city;
-            string region = data.region;
             string country = data.country;
             string latitude = data.latitude;
             string longitude = data.longitude;
@@ -197,6 +195,7 @@ class Program
                 {
                     var plant = new Plant(Naam, Oorsprong, hoogte, Land, Breedtegraad, Lengtegraad, beschrijving);
                     ongeldigeinvoer = false;
+                    _databaseService.VoegOrganismeToe(dier);
                 }
                 else { Console.WriteLine("Voer astublieft een geldig getal in."); }
             }
