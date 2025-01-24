@@ -37,14 +37,24 @@
 
                 command.CommandText = @"
                         CREATE TABLE IF NOT EXISTS Locatie (
-                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            Land TEXT NOT NULL,
-                            Breedtegraad REAL,
-                            Lengtegraad REAL,
-                            OrganismeId INTEGER NOT NULL,
-                            FOREIGN KEY (OrganismeId) REFERENCES Organismen (Id)
+                                Id           INTEGER REFERENCES Organismen (Id) 
+                                                     PRIMARY KEY,
+                                Land         TEXT,
+                                Breedtegraad REAL,
+                                Lengtegraad  REAL
                         )";
                 command.ExecuteNonQuery();
+
+            command.CommandText = @"
+                        CREATE TABLE IF NOT EXISTS DatumTijd (
+                            Id    NUMERIC REFERENCES Organismen (Id),
+                            Tijd  TEXT,
+                            Datum TEXT,
+                            PRIMARY KEY (
+                                Id
+                            )
+                        )";
+            command.ExecuteNonQuery();
             }
 
         }
@@ -101,6 +111,18 @@
                 locatieCommand.Parameters.AddWithValue("@Id", organismeId);
 
                 locatieCommand.ExecuteNonQuery();
+
+                var DatumCommand = connection.CreateCommand();
+                DatumCommand.CommandText = @"
+                INSERT INTO DatumTijd (Id, Tijd, Datum)
+                VALUES (@Id, @Tijd, @Datum)";
+
+                DatumCommand.Parameters.AddWithValue("@Tijd", organisme.tijd);
+                DatumCommand.Parameters.AddWithValue("@Datum", organisme.datum);
+                DatumCommand.Parameters.AddWithValue("@Id", organismeId);
+                
+                DatumCommand.ExecuteNonQuery();
+
             }
         }
     }
@@ -113,12 +135,14 @@
             string Leefgebied = "";
             double HoogteInMeters = 0.0;
             string Beschrijving = "";
+            string Tijd = "";
+            string Datum = "";
 
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT * FROM Organismen LEFT JOIN Locatie on Organismen.Id = Locatie.Id";
+                command.CommandText = "SELECT * FROM Organismen LEFT JOIN Locatie on Organismen.Id = Locatie.Id LEFT JOIN DatumTijd on Organismen.Id = DatumTijd.Id";
 
                 using (var reader = command.ExecuteReader())
                 {
@@ -130,17 +154,21 @@
                             Naam = reader.GetString(reader.GetOrdinal("Naam"));
                             Oorsprong = reader.GetString(reader.GetOrdinal("Oorsprong"));
                             Leefgebied = reader.IsDBNull(reader.GetOrdinal("Leefgebied")) ? null : reader.GetString(reader.GetOrdinal("Leefgebied")); 
-                            Beschrijving = Beschrijving = reader.IsDBNull(reader.GetOrdinal("Beschrijving")) ? null : reader.GetString(reader.GetOrdinal("Beschrijving"));
+                            Beschrijving = reader.IsDBNull(reader.GetOrdinal("Beschrijving")) ? null : reader.GetString(reader.GetOrdinal("Beschrijving"));
+                            Tijd = reader.IsDBNull(reader.GetOrdinal("Tijd")) ? null : reader.GetString(reader.GetOrdinal("Tijd"));
+                            Datum = reader.IsDBNull(reader.GetOrdinal("Datum")) ? null : reader.GetString(reader.GetOrdinal("Datum"));
 
                         Dier tempDier = new Dier(Naam, Oorsprong, Leefgebied,
                             reader.GetString(reader.GetOrdinal("Land")),
                             reader.IsDBNull(reader.GetOrdinal("Breedtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Breedtegraad")),
                             reader.IsDBNull(reader.GetOrdinal("Lengtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Lengtegraad")),
-                            Beschrijving);
+                            Beschrijving, Tijd, Datum);
                             organismen.Add(tempDier);
                         }
                         else
                         {
+                            Tijd = reader.IsDBNull(reader.GetOrdinal("Tijd")) ? null : reader.GetString(reader.GetOrdinal("Tijd"));
+                            Datum = reader.IsDBNull(reader.GetOrdinal("Datum")) ? null : reader.GetString(reader.GetOrdinal("Datum"));
                             Beschrijving = Beschrijving = reader.IsDBNull(reader.GetOrdinal("Beschrijving")) ? null : reader.GetString(reader.GetOrdinal("Beschrijving"));
                             Naam = reader.GetString(reader.GetOrdinal("Naam"));
                             Oorsprong = reader.GetString(reader.GetOrdinal("Oorsprong"));
@@ -149,7 +177,7 @@
                             reader.GetString(reader.GetOrdinal("Land")),
                             reader.IsDBNull(reader.GetOrdinal("Breedtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Breedtegraad")),
                             reader.IsDBNull(reader.GetOrdinal("Lengtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Lengtegraad")),
-                            Beschrijving);
+                            Beschrijving, Tijd, Datum);
                             organismen.Add(tempPlant);
                         }
                     }
@@ -184,7 +212,9 @@
                                 reader.GetString(reader.GetOrdinal("Land")),
                                 reader.IsDBNull(reader.GetOrdinal("Breedtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Breedtegraad")),
                                 reader.IsDBNull(reader.GetOrdinal("Lengtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Lengtegraad")),
-                                reader.GetString(reader.GetOrdinal("Beschrijving"))
+                                reader.GetString(reader.GetOrdinal("Beschrijving")), 
+                                reader.IsDBNull(reader.GetOrdinal("Tijd")) ? null : reader.GetString(reader.GetOrdinal("Tijd")),
+                                reader.IsDBNull(reader.GetOrdinal("Datum")) ? null : reader.GetString(reader.GetOrdinal("Datum"))
                             ));
                         }
                         else if (type == "plant")
@@ -196,7 +226,9 @@
                                 reader.GetString(reader.GetOrdinal("Land")),
                                 reader.IsDBNull(reader.GetOrdinal("Breedtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Breedtegraad")),
                                 reader.IsDBNull(reader.GetOrdinal("Lengtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Lengtegraad")),
-                                reader.GetString(reader.GetOrdinal("Beschrijving"))
+                                reader.GetString(reader.GetOrdinal("Beschrijving")),
+                                reader.IsDBNull(reader.GetOrdinal("Tijd")) ? null : reader.GetString(reader.GetOrdinal("Tijd")),
+                                reader.IsDBNull(reader.GetOrdinal("Datum")) ? null : reader.GetString(reader.GetOrdinal("Datum"))
                             ));
                         }
                     }
@@ -232,7 +264,9 @@
                                 reader.GetString(reader.GetOrdinal("Land")),
                                 reader.IsDBNull(reader.GetOrdinal("Breedtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Breedtegraad")),
                                 reader.IsDBNull(reader.GetOrdinal("Lengtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Lengtegraad")),
-                                reader.GetString(reader.GetOrdinal("Beschrijving"))
+                                reader.GetString(reader.GetOrdinal("Beschrijving")), 
+                                reader.IsDBNull(reader.GetOrdinal("Tijd")) ? null : reader.GetString(reader.GetOrdinal("Tijd")),
+                                reader.IsDBNull(reader.GetOrdinal("Datum")) ? null : reader.GetString(reader.GetOrdinal("Datum"))
                             ));
                         }
                         else if (type == "plant")
@@ -244,7 +278,9 @@
                                 reader.GetString(reader.GetOrdinal("Land")),
                                 reader.IsDBNull(reader.GetOrdinal("Breedtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Breedtegraad")),
                                 reader.IsDBNull(reader.GetOrdinal("Lengtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Lengtegraad")),
-                                reader.GetString(reader.GetOrdinal("Beschrijving"))
+                                reader.GetString(reader.GetOrdinal("Beschrijving")),
+                                reader.IsDBNull(reader.GetOrdinal("Tijd")) ? null : reader.GetString(reader.GetOrdinal("Tijd")),
+                                reader.IsDBNull(reader.GetOrdinal("Datum")) ? null : reader.GetString(reader.GetOrdinal("Datum"))
                             ));
                         }
                     }

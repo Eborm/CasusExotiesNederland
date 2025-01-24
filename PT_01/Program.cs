@@ -112,7 +112,8 @@ class Program
         string Land = "";
         double Breedtegraad = 0.000;
         double Lengtegraad = 0.000;
-
+        string tijd = "25:65:65";
+        string datum = "-01/-01/-01";
         if (Data != "fail")
         {
             List<string> DataList = Data.Split(',').ToList();
@@ -120,6 +121,10 @@ class Program
             Breedtegraad = double.Parse(DataList[1], CultureInfo.InvariantCulture);
             Lengtegraad = double.Parse(DataList[2], CultureInfo.InvariantCulture);
         }
+        string datumstring = DatumTijd();
+        List<string> datumlist = datumstring.Split(" ").ToList();
+        tijd = datumlist[0];
+        datum = datumlist[1];
         string beschrijving = "";
         string Naam = "";
         string Oorsprong = "";
@@ -169,7 +174,7 @@ class Program
             Console.Write("Wat is het leefgebied? ");
             string Leefgebied = Console.ReadLine();
 
-            var dier = new Dier(Naam, Oorsprong, Leefgebied, Land, Breedtegraad, Lengtegraad, beschrijving);
+            var dier = new Dier(Naam, Oorsprong, Leefgebied, Land, Breedtegraad, Lengtegraad, beschrijving, tijd, datum);
             _databaseService.VoegOrganismeToe(dier);
         }
         else
@@ -195,7 +200,7 @@ class Program
                 hoogteString = string.Join(",", templist);
                 if (double.TryParse(hoogteString, out double hoogte))
                 {
-                    var plant = new Plant(Naam, Oorsprong, hoogte, Land, Breedtegraad, Lengtegraad, beschrijving);
+                    var plant = new Plant(Naam, Oorsprong, hoogte, Land, Breedtegraad, Lengtegraad, beschrijving, tijd, datum);
                     ongeldigeinvoer = false;
                     _databaseService.VoegOrganismeToe(plant);
                 }
@@ -300,4 +305,9 @@ class Program
             }
             Console.ReadKey();
         }
+
+    private static string DatumTijd()
+    {
+        return DateTime.Now.ToString();
+    }
 }
