@@ -9,6 +9,8 @@ using Microsoft.Identity.Client;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Globalization;
+using System.Net.Http.Headers;
+using System.Linq.Expressions;
 
 // Aangepaste Program klasse
 class Program
@@ -270,8 +272,32 @@ class Program
     }
 
     private static void VolledigeBeschrijving()
-    {
-        Console.WriteLine("Test_KYS");
-        Console.ReadKey();
-    }
+        {
+            bool ongeldigeinvoer = true;
+            var organismen = _databaseService.HaalAlleOrganismenOp();
+            for (int i = 0; i<organismen.Count; i++)
+            {
+                Console.WriteLine($"{i+1}. {organismen[i].Naam}");
+            }
+            while (ongeldigeinvoer)
+            {
+                Console.WriteLine("Voer het nummer in van het dier dat je wilt zien");
+                string num = Console.ReadLine();
+                try
+                {
+                    int numint = int.Parse(num);
+                    if (numint < organismen.Count+1)
+                    {
+                        Console.WriteLine(organismen[numint-1].VoledigeBeschrijving());
+                        ongeldigeinvoer = false;
+                    }
+                    else { Console.WriteLine($"Voer astublieft een geldig getal in 1 tot {organismen.Count}"); }
+                }
+                catch
+                {
+                    Console.WriteLine("ongeldige invoer voer astublieft een getal in");
+                }
+            }
+            Console.ReadKey();
+        }
 }
