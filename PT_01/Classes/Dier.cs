@@ -10,6 +10,6 @@ public class Dier : Organisme
 
     public override string Beschrijving()
     {
-        return $"De {Naam} is een {Oorsprong.ToLower()} {Type.ToLower()} en leeft in {Leefgebied}. \n Gevonden in {Land} met de coördinaten {Breedtegraad}, {Lengtegraad}. \nOp {datum}, {tijd}";
+        return $"De {Naam} is een {Oorsprong.ToLower()} {Type.ToLower()} en leeft in {Leefgebied}. \nGevonden in {Land} met de coördinaten {Breedtegraad}, {Lengtegraad}. \nOp {datum}, {tijd}";
     }
 }

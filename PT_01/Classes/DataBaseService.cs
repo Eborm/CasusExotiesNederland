@@ -196,7 +196,7 @@
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT * FROM Organismen LEFT JOIN Locatie on Organismen.Id = Locatie.Id WHERE Type = @type";
+                command.CommandText = "SELECT * FROM Organismen LEFT JOIN Locatie on Organismen.Id = Locatie.Id JOIN DatumTijd ON Organismen.Id = DatumTijd.Id WHERE Type = @type";
                 command.Parameters.AddWithValue("@type", type);
 
                 using (var reader = command.ExecuteReader())
@@ -247,7 +247,7 @@
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = @"SELECT * FROM Organismen JOIN Locatie ON Organismen.Id = Locatie.Id WHERE Oorsprong = @oorsprong";
+                command.CommandText = @"SELECT * FROM Organismen JOIN Locatie ON Organismen.Id = Locatie.Id JOIN DatumTijd ON Organismen.Id = DatumTijd.Id WHERE Oorsprong = @oorsprong";
                 command.Parameters.AddWithValue("@oorsprong", oorsprong);
 
                 using (var reader = command.ExecuteReader())
@@ -289,4 +289,54 @@
 
             return organismen;
         }
+
+    public List<Organisme> FilterenOpAlfabetische()
+    {
+        var organismen = new List<Organisme>();
+
+        using (var connection = new SqliteConnection(_connectionString))
+        {
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = @"SELECT * FROM Organismen JOIN Locatie ON Organismen.Id = Locatie.Id JOIN DatumTijd ON Organismen.Id = DatumTijd.Id ORDER BY Naam";
+
+            using (var reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    var type = reader.GetString(reader.GetOrdinal("Type"));
+                    if (type == "dier")
+                    {
+                        organismen.Add(new Dier(
+                            reader.GetString(reader.GetOrdinal("Naam")),
+                            reader.GetString(reader.GetOrdinal("Oorsprong")),
+                            reader.IsDBNull(reader.GetOrdinal("Leefgebied")) ? null : reader.GetString(reader.GetOrdinal("Leefgebied")),
+                            reader.GetString(reader.GetOrdinal("Land")),
+                            reader.IsDBNull(reader.GetOrdinal("Breedtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Breedtegraad")),
+                            reader.IsDBNull(reader.GetOrdinal("Lengtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Lengtegraad")),
+                            reader.GetString(reader.GetOrdinal("Beschrijving")),
+                            reader.IsDBNull(reader.GetOrdinal("Tijd")) ? null : reader.GetString(reader.GetOrdinal("Tijd")),
+                            reader.IsDBNull(reader.GetOrdinal("Datum")) ? null : reader.GetString(reader.GetOrdinal("Datum"))
+                        ));
+                    }
+                    else if (type == "plant")
+                    {
+                        organismen.Add(new Plant(
+                            reader.GetString(reader.GetOrdinal("Naam")),
+                            reader.GetString(reader.GetOrdinal("Oorsprong")),
+                            reader.IsDBNull(reader.GetOrdinal("HoogteInMeters")) ? 0 : reader.GetDouble(reader.GetOrdinal("HoogteInMeters")),
+                            reader.GetString(reader.GetOrdinal("Land")),
+                            reader.IsDBNull(reader.GetOrdinal("Breedtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Breedtegraad")),
+                            reader.IsDBNull(reader.GetOrdinal("Lengtegraad")) ? 0 : reader.GetDouble(reader.GetOrdinal("Lengtegraad")),
+                            reader.GetString(reader.GetOrdinal("Beschrijving")),
+                            reader.IsDBNull(reader.GetOrdinal("Tijd")) ? null : reader.GetString(reader.GetOrdinal("Tijd")),
+                            reader.IsDBNull(reader.GetOrdinal("Datum")) ? null : reader.GetString(reader.GetOrdinal("Datum"))
+                        ));
+                    }
+                }
+            }
+        }
+
+        return organismen;
+    }
 }

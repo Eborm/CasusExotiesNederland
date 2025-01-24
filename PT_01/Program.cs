@@ -51,6 +51,9 @@ class Program
                     VolledigeBeschrijving();
                     break;
                 case "6":
+                    SortAlpahbetisch();
+                    break;
+                case "7":
                     doorgaan = false;
                     break;
                 default:
@@ -69,7 +72,8 @@ class Program
         Console.WriteLine("3. Filteren op type (Dier/Plant)");
         Console.WriteLine("4. Filteren op oorsprong (Inheems/Exoot)");
         Console.WriteLine("5. Volledige beschrijving tonen");
-        Console.WriteLine("6. Afsluiten");
+        Console.WriteLine("6. Sorteren op alphabetische volgoorde");
+        Console.WriteLine("7. Afsluiten");
     }
 
     private static async Task<string> ToonLocatieViaIP()
@@ -310,4 +314,16 @@ class Program
     {
         return DateTime.Now.ToString();
     }
+
+    private static void SortAlpahbetisch()
+    {
+        var gesorteerd = _databaseService.FilterenOpAlfabetische();
+        foreach ( var organisme in gesorteerd )
+        {
+            Console.WriteLine(organisme.Beschrijving());
+        }
+        Console.WriteLine("\nDruk op een toets om door te gaan.");
+        Console.ReadKey();
+    }
+
 }

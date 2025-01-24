@@ -9,6 +9,6 @@ public class Plant : Organisme
 
     public override string Beschrijving()
     {
-        return $"De {Naam} is een {Oorsprong.ToLower()} {Type.ToLower()} en kan {HoogteInMeters} meter hoog worden. \n Gevonden in {Land} met de coördinaten {Breedtegraad}, {Lengtegraad}. \nOp {datum}, {tijd}";
+        return $"De {Naam} is een {Oorsprong.ToLower()} {Type.ToLower()} en kan {HoogteInMeters} meter hoog worden. \nGevonden in {Land} met de coördinaten {Breedtegraad}, {Lengtegraad}. \nOp {datum}, {tijd}";
     }
 }
