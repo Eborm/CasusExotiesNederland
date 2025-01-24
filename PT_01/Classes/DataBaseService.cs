@@ -5,26 +5,38 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-// Database Service class voor alle database operaties
-public class DatabaseService
+// Database configure class voor connectie met de database
+public class Databaseconfig
+{
+    public static string GetConnectionString()
+    {
+        return "Server=casusexotischnederland.database.windows.net;" +
+               "Database=excotischnederlanddb;" +
+               "Authentication=Active Directory Managed Identity;" +
+               "Encrypt=True;";
+    }
+
+    // Database Service class voor alle database operaties
+    public class DatabaseService
 {
     private readonly string _connectionString;
 
-    public DatabaseService(string databasePath)
+    public DatabaseService(string connectionString)
     {
-        _connectionString = $"Data Source={databasePath}";
+        _connectionString = connectionString;
         InitializeDatabase();
     }
 
     private void InitializeDatabase()
     {
-        using (var connection = new SqliteConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
         {
             connection.Open();
 
             // Maak de organismen tabel
-            var command = connection.CreateCommand();
-            command.CommandText = @"
+            var commands = new[]
+            {
+                @"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Organismen' AND xtype='U')
                         CREATE TABLE IF NOT EXISTS Organismen (
                             Id INTEGER PRIMARY KEY AUTOINCREMENT,
                             Naam TEXT NOT NULL,
@@ -32,20 +44,18 @@ public class DatabaseService
                             Oorsprong TEXT NOT NULL,
                             Leefgebied TEXT,
                             HoogteInMeters REAL
-                        )";
-            command.ExecuteNonQuery();
+                )";
 
-            command.CommandText = @"
+            @"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Locatie' AND xtype='U')
                         CREATE TABLE IF NOT EXISTS Locatie (
                                 Id           INTEGER REFERENCES Organismen (Id) 
                                                      PRIMARY KEY,
                                 Land         TEXT,
                                 Breedtegraad REAL,
                                 Lengtegraad  REAL
-                        )";
-            command.ExecuteNonQuery();
+                )";
 
-            command.CommandText = @"
+            @"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DatumTijd' AND xtype='U')
                         CREATE TABLE IF NOT EXISTS DatumTijd (
                             Id    NUMERIC REFERENCES Organismen (Id),
                             Tijd  TEXT,
@@ -53,15 +63,22 @@ public class DatabaseService
                             PRIMARY KEY (
                                 Id
                             )
-                        )";
-            command.ExecuteNonQuery();
-        }
+                )"
+            };
 
+            foreach (var commandText in commands)
+            {
+                using (var command = new SqlCommand(commandText, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
     }
 
     public void VoegOrganismeToe(Organisme organisme)
     {
-        using (var connection = new SqliteConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
         {
             connection.Open();
             var command = connection.CreateCommand();
@@ -138,7 +155,7 @@ public class DatabaseService
         string Tijd = "";
         string Datum = "";
 
-        using (var connection = new SqliteConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
         {
             connection.Open();
             var command = connection.CreateCommand();
@@ -192,7 +209,7 @@ public class DatabaseService
     {
         var organismen = new List<Organisme>();
 
-        using (var connection = new SqliteConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
         {
             connection.Open();
             var command = connection.CreateCommand();
@@ -243,7 +260,7 @@ public class DatabaseService
     {
         var organismen = new List<Organisme>();
 
-        using (var connection = new SqliteConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
         {
             connection.Open();
             var command = connection.CreateCommand();
@@ -294,7 +311,7 @@ public class DatabaseService
     {
         var organismen = new List<Organisme>();
 
-        using (var connection = new SqliteConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
         {
             connection.Open();
             var command = connection.CreateCommand();

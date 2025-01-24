@@ -24,7 +24,7 @@ class Program
         string? databasePath = Path.Combine(projectRoot, "Database", "organismen.db");
 
         // Initialiseer de database service
-        _databaseService = new DatabaseService(databasePath);
+        _databaseService = new DatabaseService(Databaseconfig.GetConnectionString());
 
         bool doorgaan = true;
         while (doorgaan)
