@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Data.Sqlite;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Runtime.CompilerServices;
@@ -11,6 +10,7 @@ using System.Threading.Tasks;
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Linq.Expressions;
+using Newtonsoft.Json;
 
 // Aangepaste Program klasse
 class Program
