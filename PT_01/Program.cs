@@ -11,6 +11,7 @@ using System.Globalization;
 using System.Net.Http.Headers;
 using System.Linq.Expressions;
 using Newtonsoft.Json;
+using MySql.Data.MySqlClient;
 
 // Aangepaste Program klasse
 class Program
@@ -242,7 +243,7 @@ class Program
         Console.Write("Welk type wil je zien (Dier/Plant)? ");
         string type = Console.ReadLine().ToLower();
 
-        var gefilterd = _databaseService.FilterOpType(type);
+        var gefilterd = _databaseService.HaalAlleOrganismenOp().Where(o => o.Type.ToLower() == type).ToList();
 
         foreach (var organisme in gefilterd)
         {
@@ -269,7 +270,7 @@ class Program
             else { Console.WriteLine("Ongeldige invoer"); }
         }
 
-        var gefilterd = _databaseService.FilterOpOorsprong(oorsprong);
+        var gefilterd = _databaseService.HaalAlleOrganismenOp().Where(o => o.Oorsprong.ToLower() == oorsprong).ToList();
 
         foreach (var organisme in gefilterd)
         {
@@ -317,7 +318,7 @@ class Program
 
     private static void SortAlpahbetisch()
     {
-        var gesorteerd = _databaseService.FilterenOpAlfabetische();
+        var gesorteerd = _databaseService.HaalAlleOrganismenOp().OrderBy(o => o.Naam).ToList();
         foreach (var organisme in gesorteerd)
         {
             Console.WriteLine(organisme.Beschrijving());
