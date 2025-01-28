@@ -73,7 +73,7 @@ public class DatabaseService
                 command.Parameters.AddWithValue("@type", "dier");
                 command.Parameters.AddWithValue("@oorsprong", dier.Oorsprong);
                 command.Parameters.AddWithValue("@leefgebied", dier.Leefgebied ?? DBNull.Value.ToString());
-                command.Parameters.AddWithValue("@beschrijving", dier.Beschrijving() ?? DBNull.Value.ToString());
+                command.Parameters.AddWithValue("@beschrijving", dier.beschrijving ?? DBNull.Value.ToString());
             }
             else if (organisme is Plant plant)
             {
@@ -86,7 +86,7 @@ public class DatabaseService
                 command.Parameters.AddWithValue("@type", "plant");
                 command.Parameters.AddWithValue("@oorsprong", plant.Oorsprong);
                 command.Parameters.AddWithValue("@hoogteInMeters", plant.HoogteInMeters);
-                command.Parameters.AddWithValue("@beschrijving", plant.Beschrijving() ?? DBNull.Value.ToString());
+                command.Parameters.AddWithValue("@beschrijving", plant.beschrijving ?? DBNull.Value.ToString());
             }
 
             var organismeId = Convert.ToInt32(command.ExecuteScalar());
