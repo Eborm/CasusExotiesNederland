@@ -9,9 +9,9 @@ public class Databaseconfig
 {
     public static string GetConnectionString()
     {
-        return "Server=ssdatabase.bywf3uhkkvdetepfj3egbxwzbf.ax.internal.cloudapp.net;" +
+        return "Server=172.211.6.172;" +
                "Database=exotischnederlanddb;" +
                "User ID=ssadmin;" +
-               "Password=Welkom012345!;";
+               "Password=Welkom1235!;";
     }
 }

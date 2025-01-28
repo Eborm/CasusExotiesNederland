@@ -28,7 +28,7 @@ public class DatabaseService
                     Oorsprong VARCHAR(100) NOT NULL,
                     Leefgebied VARCHAR(100),
                     HoogteInMeters FLOAT,
-                    Beschrijving VARCHAR(100)
+                    Beschrijving TEXT
                 )",
                 @"CREATE TABLE IF NOT EXISTS Locatie (
                     Id INT PRIMARY KEY,
